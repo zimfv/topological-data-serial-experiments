@@ -9,7 +9,7 @@ from package.tessellations import get_cubical_tessellation_on_torus3d
 
 clock = time.perf_counter()
 
-sizes = np.arange(2, 80)
+sizes = np.arange(2, 8)
 experiments = 100
 
 
