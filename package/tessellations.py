@@ -99,6 +99,48 @@ def get_hexagonal_tessolation_on_torus2d(n, m=None, d=0, filtration=None, undiog
     return fc
 
 
+def get_triangle_tessolation_on_torus2d(n, m=None, filtration=None, undioganal=True):
+    """
+    Returns FiltredCells for triangle tessellation on 2-dimensionall torus.
+    
+    Parameters:
+    -----------
+    n, m: int
+        Sizes of tessellation
+        If m is None, that becomes same as n
+    
+    filtration : array length n*m or None
+        Filtration values for cells. If that's None, that becames zeros.
+    
+    undiagonal : bool
+        If that's True picture becomes more rectangular by changing cords 
+    
+    Returns:
+    --------
+    fc : FiltredCells
+    """
+    if m is None:
+        m = n
+        
+    indices = np.arange(n*m).reshape([n, m])
+    cells = []
+    cords = []
+    for i in range(n):
+        for j in range(m):
+            cells.append([[indices[i, j], indices[(i+1)%n, j], indices[(i+1)%n, (j+1)%m]]])
+            cells.append([[indices[i, j], indices[i, (j+1)%m], indices[(i+1)%n, (j+1)%m]]])
+            cords.append([[i, j], [i + 1, j], [i + 1, j + 1]])
+            cords.append([[i, j], [i, j + 1], [i + 1, j + 1]])
+    cells = np.array(cells)
+    cords = np.array(cords)
+    
+    if filtration is None:
+        filtration = np.zeros(n*m)
+    fc = FiltredCells(cells, filtration=filtration)
+    fc.set_cords(cords)
+    return fc
+
+
 def get_cubical_tessellation_on_torus3d(n, m=None, k=None, filtration=None):
     """
     Returns FiltredCells for cubic tessellation on 3-dimensionall torus.
