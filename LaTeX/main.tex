@@ -1,0 +1,52 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[a4paper,hmargin=2.5cm,vmargin=2.5cm]{geometry}
+
+\begin{document}
+
+\section{Theory}
+\subsection{Persistent Homology and Giant Cycles}
+\par The first we should understand, which objects topological data analysis research.
+\par People call cloud a collection of points $\{x_\alpha\} \subset X$, where $X$ is a metric space. That's interesting to convert that data to some structure, so points can be representated as vertices of some combinatorial graph. And that graph can become scaffold of a simplicial complex. That's a good way to research data, ignoring high dimension of the space \cite{ghrist}.
+\par A simplicial complex  (I mean abstract simplicial complex) is a set of vertices $\{v_\alpha\}$ and a collection of its subsets, called simplices, $S$ such that, $\forall a\in S$ $\forall b\subset a$ $b\in S$ \cite{prasolov}. The dimension of a simplicial complex is the maximal dimension of it's simplices ($\max_{a\in S}|a| - 1$).
+\par ... Bla-bla-bla about simplicial homology...
+\par One of the popular methods to represent a cloud as a simplicial complex is the Cech complex.
+\par For a given cloud $\{x_\alpha\}\subset\mathbb{E}^n$ the Cech complex $C_\epsilon$ is the simplicial complex whose $k$-simplices (the simplices dimension $k$: $a: |a|-1 = k$) are determined by unordered $(k+1)$-tuples of points $\{x_\alpha\}_0^k$ whose closed $\epsilon/2$-ball neighbourhoods have a point of common intersection \cite{ghrist}.
+\par ... (the Cech (Nerve) theorem) 
+\par ...
+
+
+
+
+\subsection{Lattices Voronoi Cells and their Interpretations on Thorus}
+\par In this chapter we will show default definitions about lattices in $\mathbb{R}^n$, talk about Voronoi cells and then extropolate their definitions to the thorus case. 
+\par A lattice in $\mathbb{R}^n$ is a subset $\Gamma\subset\mathbb{R}^n$ with the property that there exxists a basis $(e_1, ..., e_n)$ of $\mathbb{R}^n$ s.t. $\Gamma = \mathbb{Z}e_1 \oplus\cdots\oplus \mathbb{Z}e_n$. \cite{ebeling}
+\par Let's throw few examples of lattices, which will be interesting in this work:
+\par The Lattices $Z_n$: ...
+\par The Lattices $A_n$: ...
+\par The Lattices $D_n$: ...
+
+\par Let's define a $\Gamma^*$ dual to $\Gamma$ as $\{x\in\mathbb{R^n} :\; x\cdot y\in\mathbb{Z} \; \forall y\in\Gamma\}$.
+\par ...
+
+\par Let's define $d$-dimensional thorus as $\mathbb{R}^n/\mathbb{Z}^n$ or $\left(\mathbb{R}/\mathbb{Z}\right)^n$. Not hard to see, that $\mathbb{R}/a_1\mathbb{Z}\times\cdots\times\mathbb{R}/a_n\mathbb{Z}$ ($a_1,..., a_n\in\mathbb{R}_{>0}$) will be the homeomorphically-same object.
+\par Let's redefine lattice thinking, that' lattices lie not just on $\mathbb{R}^n$, but on some thorus with defined equivalence relation. So...
+
+\subsection{Random Filtration on Cells}
+\par ...
+
+
+
+\addcontentsline{toc}{section}{References}
+\begin{thebibliography}{}
+\bibitem{ebeling} Ebeling, Wolfgang. (2002). Lattices and Codes. 10.1007/978-3-322-90014-2.
+\bibitem{prasolov}  Prasolov, V. V. (2006), Elements of combinatorial and differential topology, American Mathematical Society, ISBN 0-8218-3809-1, MR 2233951
+\bibitem{ghrist} Ghrist, Robert. (2008). Barcodes: The persistent topology of data. BULLETIN (New Series) OF THE AMERICAN MATHEMATICAL SOCIETY. 45. 10.1090/S0273-0979-07-01191-3. 
+\end{thebibliography}
+
+
+
+
+\end{document}
