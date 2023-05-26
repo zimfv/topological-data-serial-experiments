@@ -91,8 +91,14 @@ class FiltredCells:
         # 
         for i in range(len(self.cells)):
             color = cm[colormap]((self.filtration[i] - self.filtration.min())/(self.filtration.max() - self.filtration.min()))
-            x = self.cords[i][:, 0]
-            y = self.cords[i][:, 1]
-            ax.fill(x, y, color=color)
-            ax.plot(np.append(x, x[0]), np.append(y, y[0]), color=edgecolor, linewidth=edgewidth)
-            
+            if len(self.cords[i].shape) == 2:
+                x = self.cords[i][:, 0]
+                y = self.cords[i][:, 1]
+                ax.fill(x, y, color=color)
+                ax.plot(np.append(x, x[0]), np.append(y, y[0]), color=edgecolor, linewidth=edgewidth)
+            else:
+                for cords in self.cords[i]:
+                    x = cords[:, 0]
+                    y = cords[:, 1]
+                    ax.fill(x, y, color=color)
+                    ax.plot(np.append(x, x[0]), np.append(y, y[0]), color=edgecolor, linewidth=edgewidth)
