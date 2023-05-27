@@ -4,16 +4,47 @@
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage[a4paper,hmargin=2.5cm,vmargin=2.5cm]{geometry}
 
+\newcommand{\Image}{\text{Im}\;}
+\newcommand{\Ker}{\text{Ker}\;}
+
 \begin{document}
 
 \section{Theory}
 \subsection{Persistent Homology and Giant Cycles}
 \par The first we should understand, which objects topological data analysis research.
 \par People call cloud a collection of points $\{x_\alpha\} \subset X$, where $X$ is a metric space. That's interesting to convert that data to some structure, so points can be representated as vertices of some combinatorial graph. And that graph can become scaffold of a simplicial complex. That's a good way to research data, ignoring high dimension of the space \cite{ghrist}.
-\par A simplicial complex  (I mean abstract simplicial complex) is a set of vertices $\{v_\alpha\}$ and a collection of its subsets, called simplices, $S$ such that, $\forall a\in S$ $\forall b\subset a$ $b\in S$ \cite{prasolov}. The dimension of a simplicial complex is the maximal dimension of it's simplices ($\max_{a\in S}|a| - 1$).
-\par ... Bla-bla-bla about simplicial homology...
-\par One of the popular methods to represent a cloud as a simplicial complex is the Cech complex.
-\par For a given cloud $\{x_\alpha\}\subset\mathbb{E}^n$ the Cech complex $C_\epsilon$ is the simplicial complex whose $k$-simplices (the simplices dimension $k$: $a: |a|-1 = k$) are determined by unordered $(k+1)$-tuples of points $\{x_\alpha\}_0^k$ whose closed $\epsilon/2$-ball neighbourhoods have a point of common intersection \cite{ghrist}.
+\par A simplicial complex $X$ (I mean abstract simplicial complex) is a set of vertices $\{v_\alpha\}$ and a collection of its subsets, called simplices (simplex $a$ which is set of elements $k$ have dimension $k-1$ and can be called $k$-simplex), $X$ such that: for all $a\in X$ for all $b\subset a$ $b\in S$ \cite{prasolov}. The dimension of a simplicial complex is the maximal dimension of it's simplices ($\dim X = \max\limits_{a\in S} \dim a =\max\limits_{a\in S}|a| - 1$).
+\par When simplicial complex is defined, let's continue way to define simplicial homology. Let $\Delta_n(X)$ be the free abelian group with basis on $n$-simplices $e_\alpha^n$ of $X$.  That groups elements can be rewritten as $\sum_\alpha n_\alpha e_\alpha^n$ and called $n$-chains. We also can represent them as $\sum_\alpha n_\alpha \sigma_\alpha$ where the $\sigma_\alpha: \Delta^n\to X$ is the characteristic map of .%hatcher-105
+\par The boundary of $n$-simplex $(v_0, ..., v_n)$ is $(n-1)$-simplices $[v_0, ..., v_{i-1}, v_{i+1}, ..., v_n]$. So let the boundary be $\sum_i (-1)^i F_i$. The signs are inserted to take orientations into account, so that all the faces of a simplex are coherently oriented. Using that geometry we can define a boundary homomorphism $\delta: \Delta_n(X) \to \Delta_{n-1}(X)$:
+$$
+	\delta_n(\sigma_\alpha) = \sum_i (-1^i)\sigma_\alpha \;:\;
+	[v_0, ..., v_{i-1}, v_{i+1}, ..., v_n]
+$$
+\par So there is the lemma, which said that the composition $\Delta_n(X) \xrightarrow{\delta_n} \Delta_{n-1}(X) \xrightarrow{\delta_{n-1}} \xrightarrow{\delta_{n-2}} \Delta_{n-2}(X)$ is zero. That's not hard to prove. We have 
+$$\delta_n(\sigma) = \sum_i (-1)^i \sigma \;:\; [v_0, ..., v_{i-1}, v_{i+1}, ..., v_n]$$
+and hence
+$$
+\begin{matrix}
+	\delta_{n-1}\delta_{n} = 
+	\sum\limits_{j<i} (-1)^i(-1)^{j} \sigma : [v_0, ..., v_{j-1}, v_{j+1}, ..., v_{i-1}, v_{i+1}, ..., v_n] \\
+	+ 
+	\sum\limits_{j>i} (-1)^i(-1)^{j-1} \sigma : [v_0, ..., v_{i-1}, v_{i+1}, ..., v_{j-1}, v_{j+1}, ..., v_n] = 0
+\end{matrix}
+$$
+\par So we have a sequence of homomorphisms of abelian groups
+$$
+	\cdots \to 
+	C_{n+1}  \xrightarrow{\delta_{n+1}}
+	C_{n}  \to
+	\cdots \to 
+	C_{1}  \xrightarrow{\delta_{1}}
+	C_{0}  \xrightarrow{\delta_{0}} 0
+$$
+such that $\delta_n\delta_{n+1} = 0$ for each $n$. Sequences like that are called chain complexes. Cause the equation $\delta_n\delta_{n+1} = 0$ is equivalent to the inclusion $\Image \delta_{n+1} \subset \Ker \delta_n$, we can defind the $n$-th homology group of the chain complex as the quotient group $H_n = \Ker\delta_n/\Image\delta_{n+1}$. In the case of simplicial complex $C_n = \Delta_n(X)$, so the homology group $\Ker\delta_n/\Image\delta_{n+1}$ be called the $n$-th homology group of $X$ and can be noted $H_n^\Delta(X)$. People call the elements of $\Ker\delta_n$ cycles and the elements of $\Image\delta_{n+1}$ boundaries. \cite{hatcher}
+
+\par One of the natural methods to represent a cloud as a simplicial complex is the Cech complex.  For a given cloud $\{x_\alpha\}\subset\mathbb{E}^n$ the Cech complex $C_\epsilon$ is the simplicial complex whose $k$-simplices (the simplices dimension $k$: $a: |a|-1 = k$) are determined by unordered $(k+1)$-tuples of points $\{x_\alpha\}_0^k$ whose closed $\epsilon/2$-ball neighbourhoods have a point of common intersection \cite{ghrist}.
+\par Another one natural method to represent a cloud as a simplicial complex is the Rips complex. For a given cloud $\{x_\alpha\}\subset\mathbb{E}^n$ the Rips complex $R_\epsilon$ is determined by unordered $(k+1)$-tuples of points whose for each pair of points $\{x_\alpha\}_0^k$ the distance between that pairs points less or equal $\epsilon$.
+% picture
 \par ... (the Cech (Nerve) theorem) 
 \par ...
 
@@ -41,6 +72,7 @@
 
 \addcontentsline{toc}{section}{References}
 \begin{thebibliography}{}
+\bibitem{hatcher} Hatcher, A. (2001). Algebraic topology. Proceedings of The Edinburgh Mathematical Society - PROC EDINBURGH MATH SOC. 46. 511-512. 10.1017/S0013091503214620. 
 \bibitem{ebeling} Ebeling, Wolfgang. (2002). Lattices and Codes. 10.1007/978-3-322-90014-2.
 \bibitem{prasolov}  Prasolov, V. V. (2006), Elements of combinatorial and differential topology, American Mathematical Society, ISBN 0-8218-3809-1, MR 2233951
 \bibitem{ghrist} Ghrist, Robert. (2008). Barcodes: The persistent topology of data. BULLETIN (New Series) OF THE AMERICAN MATHEMATICAL SOCIETY. 45. 10.1090/S0273-0979-07-01191-3. 
