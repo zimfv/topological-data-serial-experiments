@@ -1,6 +1,7 @@
 import numpy as np
 from itertools import product
 from package.filtredcells import *
+from package import complexes
 
 
 def get_cubical_tessellation_on_torus2d(n, m=None, filtration=None):
@@ -257,4 +258,81 @@ def get_latticeD3_tessellation_on_torus3d(n: int, m=None, k=None, filtration=Non
         fc.yticks = np.arange(2*n*(2*k+2)) - 1
         fc.ylabels = np.array([(fc.yticks+1) % (2*k+2) - 1, (fc.yticks+1) // (2*k+2)]).transpose()
     
+    return fc
+
+
+def get_fcc_tessellation_on_torus3d(n: int, m=None, k=None, filtration=None):
+    # new name for get_latticeD3_tessellation_on_torus3d
+    return get_latticeD3_tessellation_on_torus3d(n, m, k, filtration)
+
+
+def get_bcc_tessellation_on_torus3d(n, m=None, k=None, filtration=None, unit_code='34'):
+    """
+    Returns FiltredCells for cubic tessellation on 2-dimensionall torus.
+    
+    Parameters:
+    -----------
+    n, m, k: int
+        Sizes of tessellation
+        If m is None, that becomes same as n
+        If k is None, that becomes same as 2*m
+    
+    filtration : array length n*m or None
+        Filtration values for cells. If that's None, that becames zeros.
+        
+    unit_code : str
+        Code of unit simplex complex - representation of truncated octahedron
+        '24nr' : 24 simplices but there are not each face parallely moved to zero gives a reflection.
+        '34' : 34 simlices
+        '44' : 44 simlices
+        '72' : 72 simlices
+    
+    Returns:
+    --------
+    fc : FiltredCells
+    """
+    if m is None:
+        m = n
+    if k is None:
+        k = 2*m
+    
+    unit_simplices = {'24nr' : complexes.TruncatedOctahedron_24nr, 
+                      '34' : complexes.TruncatedOctahedron_34, 
+                      '44' : complexes.TruncatedOctahedron_44, 
+                      '72' : complexes.TruncatedOctahedron_72}[str(unit_code)]
+    basis = np.array([[2, 0, 0], [0, 2, 0], [1, 1, 1]])
+    verts = np.array(list(product(np.arange(n), np.arange(m), np.arange(k))))
+    verts = np.array([(vert.reshape([1, 3])@basis)[0] for vert in verts])
+    verts %= np.array([2*n, 2*m, 2*k])
+    verts
+    #print(verts)
+    cells = (2*np.array([vert + unit_simplices for vert in verts])).astype(int)
+    cells %= np.array([4*n, 4*m, 2*k])
+    cells *= np.array([1, 4*n, 16*n*m])
+    cells = cells.sum(axis=-1)
+    if filtration is None:
+        filtration = np.zeros(n*m*k)
+    fc = FiltredCells(cells, filtration=filtration)
+    
+    unit_cords = [np.array([(-0.5,  0.0, -1.0), ( 0.0, -0.5, -1.0), ( 0.5,  0.0, -1.0), ( 0.0,  0.5, -1.0)]), 
+                  np.array([(-1.0,  0.0, -0.5), ( 0.0, -1.0, -0.5), ( 1.0,  0.0, -0.5), ( 0.0,  1.0, -0.5)]), 
+                  np.array([(-1.0, -0.5,  0.0), (-1.0,  0.5,  0.0), (-0.5,  1.0,  0.0), ( 0.5,  1.0,  0.0), 
+                            ( 1.0,  0.5,  0.0), ( 1.0, -0.5,  0.0), ( 0.5, -1.0,  0.0), (-0.5, -1.0,  0.0)]), 
+                  np.array([(-1.0,  0.0,  0.5), ( 0.0, -1.0,  0.5), ( 1.0,  0.0,  0.5), ( 0.0,  1.0,  0.5)]), 
+                  np.array([(-0.5,  0.0,  1.0), ( 0.0, -0.5,  1.0), ( 0.5,  0.0,  1.0), ( 0.0,  0.5,  1.0)])]
+    cords = []
+    for vert in verts:
+        that_cords = []
+        for unit_cord in unit_cords:
+            cord = unit_cord + vert
+            cord_z = (2*cord[:, 2]*(2*m + 2)) % (k*(2*m + 2))
+            cord_z = np.array([np.zeros(len(cord_z)), cord_z]).transpose()
+            cord = cord[:, :2] + cord_z
+            that_cords.append(cord)
+        cords.append(np.array(that_cords))
+    
+    fc.set_cords(cords)
+    fc.yticks = np.unique(np.concatenate([np.concatenate(c) for c in cords])[:, 1])
+    fc.yticks = np.arange(-1, k*(2*m + 2) - 1)
+    fc.ylabels = [((y+1)//(2*m+2), y%(2*m+2)) for y in fc.yticks]
     return fc
