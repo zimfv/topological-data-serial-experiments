@@ -1,6 +1,6 @@
 # About repository
 
-That's a repository I used to make experiments for [the HSE topological data analysis course](https://math.hse.ru/en/courses/647341544.html).
+That's a repository I used to make experiments for [the HSE Topological Data Analysis course](https://math.hse.ru/en/courses/647341544.html).
 Then I stared research for my graduate thesis here.
 
 The first part of the researh was repeating of experiments from Bobrowskis and Skrabas article [Homological Percolation and the Euler Characteristic](https://arxiv.org/abs/1910.10146) and runing few my own. 
