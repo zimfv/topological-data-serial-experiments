@@ -78,6 +78,22 @@ def get_hyperspaces_containing(points, p=0, eps=10**-6):
     return matrices, indices
 
 
+def get_max_hyperspace_containing(points, p=0, eps=10**-6):
+    # returns matrix of points, defining hyperspace, containing p and max number of points from given
+    m_list, h_list = get_hyperspaces_containing(points, p=p, eps=eps)
+    lengths = np.array([len(hl) for hl in h_list])
+    index = np.where(lengths == max(lengths))[0][0]
+    return m_list[index]
+
+
+def get_min_hyperspace_containing(points, p=0, eps=10**-6):
+    # returns matrix of points, defining hyperspace, containing p and max number of points from given
+    m_list, h_list = get_hyperspaces_containing(points, p=p, eps=eps)
+    lengths = np.array([len(hl) for hl in h_list])
+    index = np.where(lengths == min(lengths))[0][0]
+    return m_list[index]
+
+
 def get_hyperspace_value(points, p=0):
     # returns hyperspace value for point p for hyperspace defined by given points
     #"""
@@ -109,7 +125,7 @@ def reflect(points, vector):
     # returns reflection of points relative to a vector
     # s_{v} p = p - 2<p,v>/<v,v>*v
     coeff = 2 * np.dot(points, vector) / np.dot(vector, vector)
-    new_points = points - vector.reshape([1, len(vector)])*coeff.reshape(len(coeff), 1)
+    new_points = points - coeff.reshape(len(coeff), 1)*vector.reshape([1, len(vector)])
     return new_points
 
 
