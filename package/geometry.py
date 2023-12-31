@@ -2,6 +2,16 @@ import itertools
 import numpy as np
 
 
+def collinear(a, b):
+    # returns True if vectors a and b are collinear
+    if len(a) != len(b):
+        raise ValueError('Vectors has different dimensions')
+    if ((a == 0) != (b == 0)).any():
+        return False
+    l = a[a != 0] / b[b!= 0]
+    return (l[1:] == l[:-1]).all()
+
+
 def sets_in_hyperspace(set0, set1, eps=10**-6):
     # returns True if sets are in 1 hyperspace
     g = True
@@ -15,32 +25,46 @@ def sets_in_hyperspace(set0, set1, eps=10**-6):
     return g
 
 
-def get_hyperspaces(points):
-    # returns lists of all hyperspaces containing point sets
-    dim = points.shape[-1]
-    if len(points) < dim + 1:
-        raise ValueError(f"The number of points less then {dim}-dimensional simplex size")
-    spaces = []
+def get_hyperspaces(points, eps=10**-6):
+    """
+    Returns 2 arrays defining hyperspaces which is defined by some points from cloud points
+    
+    Parameters:
+    -----------
+    points : np.array dim 2
+    
+    eps: float
+    
+    Returns:
+    matrices: array of matrices
+        Each matrix is set of points, defining hyperspace
+    
+    indices: list of int lists
+        Each list is set of point indices, lying in hyperspace
+    """
+    dim = points.shape[1]
+    matrices = []
     for simplex in itertools.combinations(np.arange(len(points)), dim):
-        simplex_points = points[np.array(simplex)]
-        g = True
-        for space_id in range(len(spaces)):
-            space_simplex = np.array(spaces[space_id][0])
-            space_points = points[space_simplex]
-            # Условие, что space_points и simplex_points из одной гиперплоскости
-            if sets_in_hyperspace(simplex_points, space_points):
-                spaces[space_id].append(simplex)
-                g = False
-        if g:
-            spaces.append([simplex])
-    for space_id in range(len(spaces)):
-        spaces[space_id] = np.unique(spaces[space_id])
-    return spaces
+        matrix = points[np.array(simplex)]
+        if np.linalg.matrix_rank(matrix) > dim-1:
+            matrices.append(matrix)
+    indices = [[] for matrix in matrices]
+    for i in range(len(points)):
+        point = points[i]
+        for k in range(len(matrices)):
+            matrix = matrices[k]
+            if abs(np.linalg.det(matrix - point.reshape([1, dim]))) < eps:
+                indices[k].append(i)
+    vals = [str(i) for i in indices]
+    vals, idx_start = np.unique(vals, return_index=True)
+    matrices = np.array(matrices)[idx_start]
+    indices = [indices[i] for i in idx_start]
+    return matrices, indices
 
 
 def get_hyperspaces_containing(points, p=0, eps=10**-6):
     """
-    Returns ...
+    Returns 2 arrays defining hyperspaces containing point p and defined by some points from cloud points
     
     Parameters:
     -----------
@@ -135,3 +159,50 @@ def get_half(points, spc, eps=10**-6):
     half = np.array([get_hyperspace_value(spc, point) for point in points])
     half = points[half >= -eps]
     return half
+
+
+def get_faces(points, r=None, with_matrices=False):
+    # returns indexes of all faces
+    dim = points.shape[1]
+    faces = []
+    matrices, indices = get_hyperspaces(points)
+    status = np.zeros(len(matrices), dtype=bool)
+    for i in range(len(status)):
+        values = np.array([get_hyperspace_value(matrices[i], p) for p in points])
+        if r is not None:
+            values = np.round(values, r)
+        if (values >= 0).all() or (values <= 0).all():
+            status[i] = True
+    faces = np.array(indices, dtype=object)[status]
+    if with_matrices:
+        return faces, np.array(matrices)[status]
+    return faces
+
+
+def get_opposite_faces(points, r=6):
+    """
+    Returns pairs of opposite faices
+    
+    Parameters:
+    -----------
+    points : np.array dim 2
+    
+    Returns:
+    --------
+    pairs_faces : list
+        list of pairs of tuple indices
+    
+    pairs_normals : list
+        list of normals arrays
+    """
+    faces, matrices = get_faces(points, r=r, with_matrices=True)
+    normals = np.array([get_normal(matrix) for matrix in matrices])
+    if r is not None:
+        normals = np.round(normals, r)
+    pairs_faces = []
+    pairs_normals = []
+    for i0, i1 in itertools.combinations(np.arange(len(normals)), 2):
+        if collinear(normals[i0], normals[i1]):
+            pairs_faces.append((faces[i0], faces[i1]))
+            pairs_normals.append(normals[i0])
+    return pairs_faces, pairs_normals
