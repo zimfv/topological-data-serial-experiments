@@ -1,6 +1,9 @@
 import itertools
 import numpy as np
 
+from icecream import ic
+#ic.disable()
+
 
 def collinear(a, b):
     # returns True if vectors a and b are collinear
@@ -206,3 +209,65 @@ def get_opposite_faces(points, r=6):
             pairs_faces.append((faces[i0], faces[i1]))
             pairs_normals.append(normals[i0])
     return pairs_faces, pairs_normals
+
+
+def get_inersection_line_hyperspace(point, vector, matrix):
+    """
+    Returns the intersection of line, defined by point and vector, and hyperspace, defined by points from matrix.
+    
+    p - point
+    v - vector
+    d - dimension
+    x_d - coeff
+    p - x = x_d*v
+    
+    System of d+1 equations:
+    x_i + v_i*x_d = p_i, i in [0, ..., d-1]
+    sum_{i=0}^{d-1} a_i*x_i = sum_{i=0}^{d-1} a_i*p_i, a_i - (0, i)-th minor of matrix * (-1)^(i)
+    """
+    ic(matrix, point, vector)
+    dim = len(point)
+    m = np.zeros([dim+1, dim+1])
+    rm = 0
+    for i in range(dim):
+        m[i, i] = 1
+        m[i, -1] = vector[i]
+        minor = np.delete(np.delete(matrix, 0, axis=0), i, axis=1)
+        ic(minor.shape)
+        minor = (-1)**i * np.linalg.det(minor)
+        ic(minor)
+        m[-1, i] = minor
+        rm += minor*point[i]
+    r = np.append(point, rm)
+    ic(m, r)
+    x = np.linalg.solve(m, r)[:-1]
+    ic(x)
+    return x
+
+
+def get_projection(point, matrix, r=None):
+    # returns the projection of point to hyperspace defined by points from matrix.
+    normal = get_normal(matrix)
+    if r is not None:
+        normal = np.round(normal, r)
+    proj = get_inersection_line_hyperspace(point, normal, matrix)
+    return proj
+
+
+def get_distance_from_point_to_hyperspace(point, matrix, r=None):
+    # returns distance between point and hyperspace, defined by points from given matrix
+    proj = get_projection(point, matrix, r)
+    return np.linalg.norm(point - proj)
+
+
+def get_distance_between_hyperspaces(matrix_a, matrix_b, r=None):
+    # returns distance between 2 hyperspaces, defined by points from given matrices
+    ic(matrix_a.shape, matrix_b.shape)
+    normal_a = get_normal(matrix_a)
+    normal_b = get_normal(matrix_b)
+    if r is not None:
+        normal_a = np.round(normal_a, r)
+        normal_b = np.round(normal_b, r)
+    if not collinear(normal_a, normal_b):
+        raise ValueError(f"Hyperspaces are not parallel\nn_a = {normal_a}\nn_b = {normal_b}")
+    return get_distance_from_point_to_hyperspace(matrix_a[0], matrix_b)

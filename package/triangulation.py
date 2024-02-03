@@ -4,7 +4,7 @@ from scipy.spatial import Delaunay
 from package import geometry
 
 from icecream import ic
-ic.disable()
+#ic.disable()
 
 def triangulate_body(points):
     # returns simplices bt simple Delaunay triangulation
